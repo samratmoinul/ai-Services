@@ -1,0 +1,36 @@
+from flask import Flask, request, jsonify
+import replicate
+import os
+
+app = Flask(__name__)
+
+# Load API Key from environment variables
+REPLICATE_API_TOKEN = os.getenv("REPLICATE_API_TOKEN")
+replicate.client = replicate.Client(api_token=REPLICATE_API_TOKEN)
+
+@app.route('/')
+def home():
+    return "AI Thumbnail Generator API is running!"
+
+@app.route('/generate-thumbnail', methods=['POST'])
+def generate_thumbnail():
+    try:
+        data = request.json
+        youtube_url = data.get("youtube_url")
+        
+        if not youtube_url:
+            return jsonify({"error": "YouTube URL is required"}), 400
+        
+        # Generate AI-modified thumbnail (Dummy Replicate API Call - Replace with real model)
+        output = replicate.run(
+            "your-replicate-model",  # Replace with actual AI model
+            input={"image": youtube_url}
+        )
+        
+        return jsonify({"generated_thumbnail": output})
+    
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
